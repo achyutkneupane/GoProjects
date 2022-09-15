@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="w-screen pt-24 flex justify-center items-center bg-gray-100">
+    <div class="p-4 bg-gray-800 text-white w-5/6 md:w-1/2 flex flex-col gap-8 rounded-2xl shadow-2xl shadow-black">
+        <h1 class="text-6xl text-center font-extrabold uppercase">
+            {{.Title}}
+        </h1>
+        <div class="flex flex-col justify-center gap-4">
+        {{ if .TodoItems }}
+            {{ range .TodoItems }}
+            <div class="border-2 shadow shadow-gray-200 p-4 rounded-xl cursor-pointer flex flex-col md:flex-row justify-between gap-2 w-full" key="{{ .Id }}">
+                <div class="flex flex-col gap-1">
+                    <h2 class="font-bold text-xl">
+                    {{ .Title }}
+                    </h2>
+                    <p class="text-md">
+                    {{ .Description }}
+                    </p>
+                </div>
+                <div class="flex flex-row gap-2">
+                {{ if not .Completed }}
+                    <button class="bg-green-700 text-white px-4 py-2 rounded-md">
+                        Completed
+                    </button>
+                {{ end }}
+                    <button class="bg-red-500 text-white px-4 py-2 rounded-md">
+                        Delete
+                    </button>
+                </div>
+            </div>
+            {{ end }}
+        {{ else }}
+            <h2 class="border-2 shadow shadow-gray-200 p-4 rounded-xl text-center text-3xl w-full">
+                No Todo Items
+            </h2>
+        {{ end }}
+        </div>
+    </div>
+</body>
+</html>

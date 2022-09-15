@@ -1,4 +1,4 @@
 todo
 pkg
-*.mod
-*.sum
+**/*.sum
+**/*.mod
