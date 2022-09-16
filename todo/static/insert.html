@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Todo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="w-screen pt-24 flex justify-center items-center bg-gray-100">
+    <div class="py-12 px-8 bg-gray-800 text-white w-5/6 md:w-1/2 flex flex-col gap-8 rounded-2xl shadow-2xl shadow-black">
+        <h1 class="text-6xl text-center font-extrabold uppercase">
+            Add Todo
+        </h1>
+        <form method="POST" action="/add" class="flex flex-col justify-center gap-4">
+            <div class="flex flex-col gap-2">
+                <label for="title" class="text-xl font-bold">Title</label>
+                <input type="text" name="title" id="title" class="p-2 rounded-lg shadow-lg border border-gray-800 text-black placeholder-gray-600" placeholder="Enter Title">
+            </div>
+            <div class="flex flex-col gap-2">
+                <label for="description" class="text-xl font-bold">Description</label>
+                <textarea name="description" id="description" rows="4" class="p-2 rounded-lg shadow-lg border border-gray-800 text-black placeholder-gray-600" placeholder="Enter Description"></textarea>
+            </div> 
+            <button class="p-2 rounded-lg shadow-lg bg-gray-800 border border-white text-white font-bold text-2xl">Add</button>
+        </form>
+    </div>
+</body>
+</html>

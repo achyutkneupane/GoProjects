@@ -12,8 +12,9 @@ import (
 type TodoItem struct {
 	Id			int
 	Title		string
-	Description	string
+	Description string
 	Completed	bool
+	DeletedAt	sql.NullString
 }
 
 type PageData struct {
@@ -45,6 +46,7 @@ func main() {
 		log.Fatal("Unable to parse template: ", err)
 	}
 	mux.HandleFunc("/", indexHandler)
+	mux.HandleFunc("/add", addTodoHandler)
 	mux.HandleFunc("/completed", completedHandler)
 
 	log.Println("Listening on http://localhost:8080...")
@@ -64,8 +66,9 @@ func createDatabase() {
 		CREATE TABLE IF NOT EXISTS todo (
 			id int(11) NOT NULL AUTO_INCREMENT,
 			title varchar(255) NOT NULL,
-			description varchar(255) NOT NULL,
+			description varchar(255) NULL,
 			completed boolean NOT NULL,
+			deleted_at datetime NULL,
 			PRIMARY KEY (id)
 		)
 		ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -87,7 +90,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 	for rows.Next() {
 		todoItem := TodoItem{}
-		err := rows.Scan(&todoItem.Id, &todoItem.Title, &todoItem.Description, &todoItem.Completed)
+		err := rows.Scan(&todoItem.Id, &todoItem.Title, &todoItem.Description, &todoItem.Completed, &todoItem.DeletedAt)
 		if err != nil {
 			log.Fatal("Unable to scan data: ", err)
 		}
@@ -118,5 +121,32 @@ func completedHandler(w http.ResponseWriter, r *http.Request) {
 			log.Fatal("Unable to complete task: ", err)
 		}
 		http.Redirect(w, r, "/", http.StatusSeeOther)
+	}
+}
+
+func addTodoHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/add" {
+		http.Error(w, "404 not found", http.StatusNotFound)
+		return
+	}
+	if r.Method == "POST" {
+		if err := r.ParseForm(); err != nil {
+			fmt.Fprintf(w, "ParseForm() err: %v", err)
+			return
+		}
+		title := r.FormValue("title")
+		description := r.FormValue("description")
+		insertData := "INSERT INTO todo (title, description, completed) VALUES (?, ?, ?);"
+		_, err = db.Exec(insertData, title, description, 0)
+		if err != nil {
+			log.Fatal("Unable to insert data: ", err)
+		}
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	} else {
+		if(r.Method == "GET") {
+			http.ServeFile(w, r, "static/insert.html")
+		} else {
+			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
+		}
 	}
 }
