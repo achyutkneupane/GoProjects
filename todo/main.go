@@ -13,7 +13,7 @@ type TodoItem struct {
 	Id			int
 	Title		string
 	Description string
-	Completed	bool
+	CompletedAt	sql.NullString
 	DeletedAt	sql.NullString
 }
 
@@ -48,6 +48,7 @@ func main() {
 	mux.HandleFunc("/", indexHandler)
 	mux.HandleFunc("/add", addTodoHandler)
 	mux.HandleFunc("/completed", completedHandler)
+	mux.HandleFunc("/deleted", deletedHandler)
 
 	log.Println("Listening on http://localhost:8080...")
 	log.Fatal(http.ListenAndServe(":8080", mux))
@@ -67,7 +68,7 @@ func createDatabase() {
 			id int(11) NOT NULL AUTO_INCREMENT,
 			title varchar(255) NOT NULL,
 			description varchar(255) NULL,
-			completed boolean NOT NULL,
+			completed_at datetime NULL,
 			deleted_at datetime NULL,
 			PRIMARY KEY (id)
 		)
@@ -81,7 +82,7 @@ func createDatabase() {
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	todoItems = []TodoItem{}
-	selectData := "SELECT * FROM " + databaseName + ".todo ORDER BY completed ASC, title ASC;"
+	selectData := "SELECT * FROM " + databaseName + ".todo WHERE deleted_at IS NULL ORDER BY completed_at ASC, title ASC;"
 	rows, err := db.Query(selectData)
 	if err != nil {
 		log.Fatal("Unable to select data: ", err)
@@ -90,7 +91,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 	for rows.Next() {
 		todoItem := TodoItem{}
-		err := rows.Scan(&todoItem.Id, &todoItem.Title, &todoItem.Description, &todoItem.Completed, &todoItem.DeletedAt)
+		err := rows.Scan(&todoItem.Id, &todoItem.Title, &todoItem.Description, &todoItem.CompletedAt, &todoItem.DeletedAt)
 		if err != nil {
 			log.Fatal("Unable to scan data: ", err)
 		}
@@ -115,11 +116,35 @@ func completedHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		taskId = r.FormValue("id")
-		completeTask := "UPDATE todo SET completed=1 WHERE id=" + taskId + ";"
+		completeTask := "UPDATE todo SET completed_at=NOW() WHERE id=" + taskId + ";"
 		_, err = db.Exec(completeTask)
 		if err != nil {
 			log.Fatal("Unable to complete task: ", err)
 		}
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	} else {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	}
+}
+
+func deletedHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/deleted" {
+		http.Error(w, "404 not found", http.StatusNotFound)
+		return
+	}
+	if r.Method == "POST" {
+		if err := r.ParseForm(); err != nil {
+			fmt.Fprintf(w, "ParseForm() err: %v", err)
+			return
+		}
+		taskId = r.FormValue("id")
+		deletedTask := "UPDATE todo SET deleted_at=NOW() WHERE id=" + taskId + ";"
+		_, err = db.Exec(deletedTask)
+		if err != nil {
+			log.Fatal("Unable to delete task: ", err)
+		}
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	} else {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
 }
@@ -136,8 +161,8 @@ func addTodoHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		title := r.FormValue("title")
 		description := r.FormValue("description")
-		insertData := "INSERT INTO todo (title, description, completed) VALUES (?, ?, ?);"
-		_, err = db.Exec(insertData, title, description, 0)
+		insertData := "INSERT INTO todo (title, description, completed_at) VALUES (?, ?, ?);"
+		_, err = db.Exec(insertData, title, description, nil)
 		if err != nil {
 			log.Fatal("Unable to insert data: ", err)
 		}

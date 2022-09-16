@@ -25,7 +25,7 @@
                     </p>
                 </div>
                 <div class="flex flex-row gap-2 items-center">
-                {{ if not .Completed }}
+                {{ if not .CompletedAt.Valid }}
                     <form action="/completed" method="POST">
                         <input type="hidden" name="id" value="{{ .Id }}" />
                         <button class="bg-green-700 text-white px-4 py-2 rounded-md">
