@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"html/template"
@@ -25,6 +26,7 @@ var err error
 var tmpl *template.Template
 var databaseName = "gotodo"
 var todoItems []TodoItem
+var taskId string
 
 func main() {
 	db, err = sql.Open("mysql", "achyut:achyut@tcp(127.0.0.1:3306)/" + databaseName)
@@ -43,6 +45,7 @@ func main() {
 		log.Fatal("Unable to parse template: ", err)
 	}
 	mux.HandleFunc("/", indexHandler)
+	mux.HandleFunc("/completed", completedHandler)
 
 	log.Println("Listening on http://localhost:8080...")
 	log.Fatal(http.ListenAndServe(":8080", mux))
@@ -75,7 +78,7 @@ func createDatabase() {
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	todoItems = []TodoItem{}
-	selectData := "SELECT * FROM " + databaseName + ".todo;"
+	selectData := "SELECT * FROM " + databaseName + ".todo ORDER BY completed ASC, title ASC;"
 	rows, err := db.Query(selectData)
 	if err != nil {
 		log.Fatal("Unable to select data: ", err)
@@ -96,4 +99,24 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		TodoItems: todoItems,
 	}
 	tmpl.Execute(w, data)
+}
+
+func completedHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/completed" {
+		http.Error(w, "404 not found", http.StatusNotFound)
+		return
+	}
+	if r.Method == "POST" {
+		if err := r.ParseForm(); err != nil {
+			fmt.Fprintf(w, "ParseForm() err: %v", err)
+			return
+		}
+		taskId = r.FormValue("id")
+		completeTask := "UPDATE todo SET completed=1 WHERE id=" + taskId + ";"
+		_, err = db.Exec(completeTask)
+		if err != nil {
+			log.Fatal("Unable to complete task: ", err)
+		}
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	}
 }

@@ -24,15 +24,21 @@
                     {{ .Description }}
                     </p>
                 </div>
-                <div class="flex flex-row gap-2">
+                <div class="flex flex-row gap-2 items-center">
                 {{ if not .Completed }}
-                    <button class="bg-green-700 text-white px-4 py-2 rounded-md">
-                        Completed
-                    </button>
+                    <form action="/completed" method="POST">
+                        <input type="hidden" name="id" value="{{ .Id }}" />
+                        <button class="bg-green-700 text-white px-4 py-2 rounded-md">
+                            Completed
+                        </button>
+                    </form>
                 {{ end }}
-                    <button class="bg-red-500 text-white px-4 py-2 rounded-md">
-                        Delete
-                    </button>
+                    <form action="/deleted" method="POST">
+                        <input type="hidden" name="id" value="{{ .Id }}" />
+                        <button class="bg-red-500 text-white px-4 py-2 rounded-md">
+                            Delete
+                        </button>
+                    </form>
                 </div>
             </div>
             {{ end }}
