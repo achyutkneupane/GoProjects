@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - Go Auth</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="w-screen h-screen flex justify-center items-center bg-red-100">
+    <div
+      class="p-8 bg-red-800 text-white w-11/12 md:w-1/2 flex flex-col gap-8 rounded-2xl shadow-2xl shadow-black"
+    >
+      <h1 class="text-4xl text-center font-extrabold uppercase">Register</h1>
+      <form action="/register" method="POST" class="flex flex-col gap-4">
+        <div class="flex flex-col md:flex-row gap-4">
+          <div class="flex flex-col w-full md:w-1/2">
+            <label for="firstName" class="text-lg font-bold">First Name</label>
+            <input
+              type="text"
+              name="firstName"
+              id="firstName"
+              placeholder="Enter Your First Name"
+              class="p-2 rounded-lg border-2 border-red-800 focus:outline-none focus:border-white-600 placeholder-gray-400 text-black"
+            />
+          </div>
+          <div class="flex flex-col w-full md:w-1/2">
+            <label for="lastName" class="text-lg font-bold">Last Name</label>
+            <input
+              type="text"
+              name="lastName"
+              id="lastName"
+              placeholder="Enter Your Last Name"
+              class="p-2 rounded-lg border-2 border-red-800 focus:outline-none focus:border-white-600 placeholder-gray-400 text-black"
+            />
+          </div>
+        </div>
+        <div class="flex flex-col">
+          <label for="username" class="text-lg font-bold">Username</label>
+          <input
+            type="text"
+            name="username"
+            id="username"
+            placeholder="Enter Your Desired UserName"
+            class="p-2 rounded-lg border-2 border-red-800 focus:outline-none focus:border-white-600 placeholder-gray-400 text-black"
+          />
+        </div>
+        <div class="flex flex-col">
+          <label for="email" class="text-lg font-bold">Email</label>
+          <input
+            type="text"
+            name="email"
+            id="email"
+            placeholder="Enter Your Email Address"
+            class="p-2 rounded-lg border-2 border-red-800 focus:outline-none focus:border-white-600 placeholder-gray-400 text-black"
+          />
+        </div>
+        <div class="flex flex-col md:flex-row gap-4">
+          <div class="flex flex-col w-full md:w-1/2">
+            <label for="gender" class="text-lg font-bold">Gender</label>
+            <select
+              name="gender"
+              id="gender"
+              class="p-2 rounded-lg border-2 border-red-800 focus:outline-none focus:border-white-600 placeholder-gray-400 text-black"
+            >
+              <option value="" disabled selected>Select a Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+              <option value="pnts">Prefer Not To Say</option>
+            </select>
+          </div>
+          <div class="flex flex-col w-full md:w-1/2">
+            <label for="password" class="text-lg font-bold">Password</label>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              placeholder="Enter Your Password"
+              class="p-2 rounded-lg border-2 border-red-800 focus:outline-none focus:border-white-600 placeholder-gray-400 text-black"
+            />
+          </div>
+        </div>
+        <button
+          type="submit"
+          class="p-2 mt-4 rounded-lg border-2 border-red-800 bg-white text-red-800 font-bold text-lg hover:bg-red-800 hover:text-white hover:border-white"
+        >
+            Register
+        </button>
+        <div class="text-center">
+            Already have an account? <a href="/login" class="text-lg text-center text-white hover:font-bold">Login</a>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

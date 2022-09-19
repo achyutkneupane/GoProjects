@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Auth</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="w-screen h-screen flex justify-center items-center bg-red-100">
+    <div class="flex flex-col justify-center items-center gap-4">
+        <div class="bg-red-600 hover:bg-red-800 text-white font-bold text-3xl text-center py-3 px-8 rounded">
+            Hello {{ .FirstName }} {{ .LastName }}
+        </div>
+        <a href="/logout" class="bg-white hover:bg-red-800 text-red-800 hover:text-white border-4 w-1/2 border-red-800 font-bold text-3xl text-center py-3 px-3 rounded">
+            Logout
+        </a>
+    </div>
+</body>
+</html>
