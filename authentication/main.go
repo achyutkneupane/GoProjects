@@ -1,35 +1,55 @@
 package main
 
 import (
-	"fmt"
-	// "log"
-	"database/sql"
-	"gorm.io/gorm"
-	"gorm.io/driver/mysql"
-	"net/http"
-	"html/template"
 	"crypto/sha1"
+	"database/sql"
+	"fmt"
+	"html/template"
+	"log"
+	"net/http"
+	"os"
 	"time"
-)
 
-type User struct {
-	Id			int `gorm:"primaryKey,autoIncrement,not null"`
-	Username	string `gorm:"unique,not null"`
-	Password	string `gorm:"not null"`
-	Email		string `gorm:"unique,not null"`
-	FirstName	string `gorm:"not null"`
-	LastName	string `gorm:"not null"`
-	Gender		string `gorm:"not null"`
-	CreatedAt	string
-	DeletedAt	sql.NullString
-}
+	"github.com/joho/godotenv"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+)
 
 var db *gorm.DB
 var err error
-var dbName = "goauth"
-var dsn = "achyut:achyut@tcp(localhost:3306)/"+dbName+"?charset=utf8&parseTime=True&loc=Local"
+var dbHost, dbPort, dbUser, dbPass, dbName string
+var dsn string
+
+type User struct {
+	Id        int    `gorm:"primaryKey,autoIncrement,not null"`
+	Username  string `gorm:"unique,not null"`
+	Password  string `gorm:"not null"`
+	Email     string `gorm:"unique,not null"`
+	FirstName string `gorm:"not null"`
+	LastName  string `gorm:"not null"`
+	Gender    string `gorm:"not null"`
+	CreatedAt string
+	DeletedAt sql.NullString
+}
+
+func init() {
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+}
 
 func main() {
+
+	dbHost = os.Getenv("DB_HOST")
+	dbPort = os.Getenv("DB_PORT")
+	dbUser = os.Getenv("DB_USERNAME")
+	dbPass = os.Getenv("DB_PASSWORD")
+	dbName = os.Getenv("DB_NAME")
+
+	dsn = dbUser + ":" + dbPass + "@tcp(" + dbHost + ":" + dbPort + ")/" + dbName + "?charset=utf8&parseTime=True&loc=Local"
+
 	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
@@ -66,7 +86,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}
-		if(data.Username != "") {
+		if data.Username != "" {
 			tmpl := template.Must(template.ParseFiles("static/dashboard.html"))
 			tmpl.Execute(w, data)
 		}
@@ -98,11 +118,11 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Invalid username or password", http.StatusForbidden)
 			return
 		}
-		
+
 		// Set cookie
 		cookie := http.Cookie{
-			Name: "goauthsession",
-			Value: username,
+			Name:    "goauthsession",
+			Value:   username,
 			Expires: time.Now().Add(24 * time.Hour),
 		}
 
@@ -135,12 +155,12 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		password = fmt.Sprintf("%x", sha1.Sum([]byte(password)))
 
 		user := User{
-			Username: username,
-			Password: password,
-			Email: email,
+			Username:  username,
+			Password:  password,
+			Email:     email,
 			FirstName: firstName,
-			LastName: lastName,
-			Gender: gender,
+			LastName:  lastName,
+			Gender:    gender,
 			CreatedAt: time.Now().String()[:19],
 		}
 
