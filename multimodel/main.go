@@ -14,7 +14,7 @@ func main() {
 	user.Id = 1
 	user.Username = "achyut"
 	user.Password = "achyut"
-	user.Email = "achyut@gmail.com"
+	user.Email = "achyutkneupane@gmail.com"
 	user.FirstName = "Achyut"
 	user.LastName = "Neupane"
 
